@@ -103,6 +103,22 @@ class PostController extends Controller
         }
     }
 
+    public function latestPosts()
+    {
+        $user = auth()->user();
+        $posts = Post::where('hidden', '0') // Select posts where 'hidden' column is '0'
+                     ->latest()
+                     ->take(5)
+                     ->get(); // Example: Get the 5 latest posts
+
+                     return inertia("Latest", [
+                        "posts" => PostResource::collection($posts),
+                        'auth' => [
+                            'user' => auth()->user(), // Pass authenticated user information
+                        ],
+                    ]);
+
+    }
 
 
 

@@ -41,4 +41,6 @@ Route::middleware('auth')->group(function () {
 
 });
 
+Route::get('/latest-posts', [PostController::class, 'latestPosts'])->name('post.latest');
+
 require __DIR__.'/auth.php';

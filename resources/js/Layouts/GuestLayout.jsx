@@ -1,5 +1,4 @@
 import { useState } from "react";
-import ApplicationLogo from "@/Components/ApplicationLogo";
 import HomeNavLink from "@/Components/HomeNavLink";
 import { Link } from "@inertiajs/react";
 
@@ -107,7 +106,7 @@ export default function Guest({ children }) {
                 </nav>
                 <nav className="relative">
                     <div className="flex items-center justify-between">
-                        <h1 className="ml-12 text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
+                        <h1 className="ml-12 text-xl font-bold leading-tight text-gray-800 dark:text-gray-200">
                             This is where we tell stories
                         </h1>
                         <Link
@@ -120,6 +119,12 @@ export default function Guest({ children }) {
                 </nav>
 
                 <div className="items-end w-full p-3 text-lg font-bold text-gray-700 bg-white border-t border-gray-300 dark:bg-white dark:text-gray-900 mt-11">
+                    <HomeNavLink
+                        href={route("post.latest")}
+                        active={route().current("post.latest")}
+                    >
+                        Latest Post
+                    </HomeNavLink>
                     <HomeNavLink
                         href={route("dashboard")}
                         active={route().current("dashboard")}
@@ -141,9 +146,7 @@ export default function Guest({ children }) {
                 </div>
             </div>
 
-            <div className="w-full px-6 py-4 mt-6 overflow-hidden bg-white shadow-md sm:max-w-md dark:bg-gray-800 sm:rounded-lg">
-                {children}
-            </div>
+            <main>{children}</main>
         </div>
     );
 }
