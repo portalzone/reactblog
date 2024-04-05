@@ -8,11 +8,13 @@ use App\Models\Category;
 use Illuminate\Support\Str;
 use App\Http\Resources\PostResource;
 use App\Http\Resources\UserResource;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\StorePostRequest;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\UpdatePostRequest;
 use App\Http\Resources\CategoryResource;
+use Illuminate\Support\Facades\Redirect;
 
 class PostController extends Controller
 {
@@ -21,7 +23,19 @@ class PostController extends Controller
      */
     public function index()
     {
+        $user = auth()->user();
+        if (!$user || !in_array($user->power, [3, 9])) {
+            return inertia("Posts/Disallowed");
+        }
         $query = Post::query();
+
+        // If user's power is 3, filter posts by user_id
+        $query->where('posts.hidden', 0);
+
+        if ($user && $user->power == 3) {
+            $query->where('posts.user_id', $user->id);
+        }
+
 
         $sortField = request("sort_field", 'created_at');
         $sortDirection = request("sort_direction", "desc");
@@ -41,15 +55,67 @@ class PostController extends Controller
             "posts" => PostResource::collection($posts),
             'queryParams' => request()->query() ?: null,
             'success' => session('success'),
+            'auth' => [
+                'user' => auth()->user(), // Pass authenticated user information
+            ],
         ]);
 
     }
+
+    public function delete()
+    {
+        $user = auth()->user();
+
+        if (!$user || !in_array($user->power, [3, 9])) {
+            return inertia("Posts/Disallowed");
+        }
+
+        if ($user->power == 9) {
+            // User has power of 9, see the posts deleted by the moderator
+
+            $query = Post::query();
+
+            // Apply filters
+            if (request("name")) {
+                $query->where("name", "like", "%" . request("name") . "%");
+            }
+            if (request("hidden")) {
+                $query->where("hidden", request("hidden"));
+            }
+            $query->where('posts.hidden', 1);
+
+            // Retrieve and paginate posts
+            $posts = $query->orderBy(request("sort_field", 'created_at'), request("sort_direction", "desc"))
+                ->paginate(10)
+                ->onEachSide(1);
+
+            return inertia("Posts/Delete", [
+                "posts" => PostResource::collection($posts),
+                'queryParams' => request()->query() ?: null,
+                'success' => session('success'),
+                'auth' => [
+                    'user' => auth()->user(), // Pass authenticated user information
+                ],
+            ]);
+        } else {
+            // User does not have sufficient permissions, return unauthorized access error
+            return inertia("Posts/Disallowed");
+        }
+    }
+
+
+
 
     /**
      * Show the form for creating a new resource.
      */
     public function create()
     {
+        $user = auth()->user();
+        if (!$user || !in_array($user->power, [3, 9])) {
+            return inertia("Posts/Disallowed");
+        }
+
         $categories = Category::query()->orderBy('name', 'asc')->get();
         $users = User::query()->orderBy('name', 'asc')->get();
 
@@ -66,6 +132,10 @@ class PostController extends Controller
     public function store(StorePostRequest $request)
     {
 
+        $user = auth()->user();
+        if (!$user || !in_array($user->power, [3, 9])) {
+            return inertia("Posts/Disallowed");
+        }
         $data = $request->validated();
         /** @var $image \Illuminate\Http\UploadedFile */
         $image = $data['image'] ?? null;
@@ -85,8 +155,13 @@ class PostController extends Controller
      */
     public function show(Post $post)
     {
+        $user = auth()->user();
+        if (!$user || !in_array($user->power, [3, 9])) {
+            return inertia("Posts/Disallowed");
+        }
+
         return inertia('Posts/Show', [
-            'task' => new PostResource($post),
+            'post' => new PostResource($post),
         ]);
     }
 
@@ -95,6 +170,10 @@ class PostController extends Controller
      */
     public function edit(Post $post)
     {
+        $user = auth()->user();
+        if (!$user || !in_array($user->power, [3, 9])) {
+            return inertia("Posts/Disallowed");
+        }
         $categories = Category::query()->orderBy('name', 'asc')->get();
         $users = User::query()->orderBy('name', 'asc')->get();
 
@@ -111,32 +190,80 @@ class PostController extends Controller
      */
     public function update(UpdatePostRequest $request, Post $post)
     {
+        $user = auth()->user();
+        if (!$user || !in_array($user->power, [3, 9])) {
+            return inertia("Posts/Disallowed");
+        }
         $data = $request->validated();
         $image = $data['image'] ?? null;
         // $data['updated_by'] = Auth::id();
-        if ($image) {
+        if ($request->file('image')) {
             if ($post->image) {
                 Storage::disk('public')->deleteDirectory(dirname($post->image));
             }
             $data['image'] = $image->store('posts/' . Str::random(), 'public');
+
+        }  else {
+            $data['image'] = $post->image;
         }
         $post->update($data);
 
         return to_route('posts.index')
-            ->with('success', "Task \"$post->name\" was updated");
+            ->with('success', "Post \"$post->name\" was updated");
+    }
+
+    public function restore(Request $request, Post $post)
+    {
+        $user = auth()->user();
+
+        // Check if user is authenticated and has sufficient permissions
+        if (!$user || !in_array($user->power, [9])) {
+            return inertia("Posts/Disallowed");
+        }
+
+        // dd($post);
+
+        // Update the 'hidden' attribute of the post
+        $post->update(['hidden' => 0]);
+
+        // Check if the post was updated successfully
+        if ($post->wasChanged()) {
+            // Return a response indicating success
+            return Redirect::back()->with(['success' => 'Post restored successfully']);
+        } else {
+            // Return a response indicating that the post was not updated
+            return Redirect::back()->withErrors(['error' => 'Failed to restore post']);
+        }
     }
 
     /**
      * Remove the specified resource from storage.
      */
     public function destroy(Post $post)
-    {
-        $name = $post->name;
+{
+    // Check if the user has the required permissions
+    $name = $post->name;
+    $user = auth()->user();
+
+    if (!$user) {
+        return inertia("Posts/Disallowed");
+    }
+
+    if ($user->power == 9) {
+        // User has power of 9, delete the post
         $post->delete();
         if ($post->image) {
             Storage::disk('public')->deleteDirectory(dirname($post->image));
         }
-        return to_route('posts.index')
-            ->with('success', "Post \"$name\" was deleted");
+    } elseif ($user->power == 3) {
+        // User has power of 3, change the 'hidden' column to 1
+        $post->hidden = 1;
+        $post->save();
+    } else {
+        // User does not have sufficient permissions, return unauthorized access error
+        return inertia("Posts/Disallowed");
     }
+
+    return to_route('posts.index')->with('success', "Post \"$name\" was deleted");
+}
 }

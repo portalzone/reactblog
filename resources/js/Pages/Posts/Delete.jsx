@@ -1,5 +1,4 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-
 import { Head, Link } from "@inertiajs/react";
 import PostsTable from "./PostsTable";
 
@@ -29,6 +28,7 @@ export default function Index({ auth, success, posts, queryParams = null }) {
                         <div className="p-6 text-gray-900 dark:text-gray-100">
                             <PostsTable
                                 posts={posts}
+                                user={auth.user} // Pass authenticated user directly
                                 queryParams={queryParams}
                                 success={success}
                             />

@@ -3,9 +3,11 @@ import SelectInput from "@/Components/SelectInput";
 import TextInput from "@/Components/TextInput";
 import TableHeading from "@/Components/TableHeading";
 import { Link, router } from "@inertiajs/react";
+import Swal from "sweetalert2";
 
 export default function PostsTable({
     posts,
+    user, // Receive user object as a prop
     success,
     queryParams = null,
     hideCategoryColumn = false,
@@ -49,13 +51,63 @@ export default function PostsTable({
         router.get(route("posts.index"), queryParams);
     };
 
-    const deletePost = (posts) => {
-        if (!window.confirm("Are you sure you want to delete the post?")) {
-            return;
-        }
-        router.delete(route("posts.destroy", posts.id));
+    const deletePost = (post) => {
+        // Corrected parameter name
+        const alerta = Swal.mixin({
+            buttonsStyling: true,
+        });
+        alerta
+            .fire({
+                title: `Are you sure you want to delete ${post.name}?`,
+                icon: "question",
+                showCancelButton: true,
+                confirmButtonText:
+                    '<i class="fa-solid fa-check"></i> Yes, delete',
+                cancelButtonText: '<i class="fa-solid fa-ban"></i> Cancel',
+            })
+            .then((result) => {
+                if (result.isConfirmed) {
+                    router.delete(route("posts.destroy", post.id), {
+                        onSuccess: () => {
+                            ok("Post deleted");
+                        },
+                    });
+                }
+            });
     };
 
+    const restorePost = (post) => {
+        // Corrected parameter name
+        const alerta = Swal.mixin({
+            buttonsStyling: true,
+        });
+        alerta
+            .fire({
+                title: `Are you sure you want to restore ${post.name}?`,
+                icon: "question",
+                showCancelButton: true,
+                confirmButtonText:
+                    '<i class="fa-solid fa-check"></i> Yes, restore',
+                cancelButtonText: '<i class="fa-solid fa-ban"></i> Cancel',
+            })
+            .then((result) => {
+                if (result.isConfirmed) {
+                    router.put(route("post.restore", post.id), {
+                        preserveState: true,
+                        onSuccess: () => {
+                            ok("Post Restored");
+                        },
+                        onError: (errors) => {
+                            console.error("Error restoring post:", errors);
+                        },
+                    });
+                }
+            });
+    };
+
+    const ok = (message) => {
+        Swal.fire({ title: message, icon: "success" });
+    };
     return (
         <>
             {success && (
@@ -176,6 +228,14 @@ export default function PostsTable({
                                     >
                                         Edit
                                     </Link>
+                                    {/* {user && user.power === 9 && ( */}
+                                    <button
+                                        onClick={(e) => restorePost(post)}
+                                        className="mx-1 font-medium text-red-600 dark:text-green-500 hover:underline"
+                                    >
+                                        Restore
+                                    </button>
+                                    {/* )} */}
                                     <button
                                         onClick={(e) => deletePost(post)}
                                         className="mx-1 font-medium text-red-600 dark:text-red-500 hover:underline"

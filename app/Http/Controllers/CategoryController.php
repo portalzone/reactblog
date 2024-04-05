@@ -18,7 +18,10 @@ class CategoryController extends Controller
      */
     public function index()
     {
-
+        $user = auth()->user();
+        if (!$user || !in_array($user->power, [9])) {
+            return inertia("Posts/Disallowed");
+        }
 
         $query = Category::query();
         $category = $query->paginate(10)
@@ -36,6 +39,10 @@ class CategoryController extends Controller
      */
     public function create()
     {
+        $user = auth()->user();
+        if (!$user || !in_array($user->power, [9])) {
+            return inertia("Posts/Disallowed");
+        }
         return inertia("Categories/Create");
     }
 
@@ -44,6 +51,10 @@ class CategoryController extends Controller
      */
     public function store(StoreCategoryRequest $request)
     {
+        $user = auth()->user();
+        if (!$user || !in_array($user->power, [9])) {
+            return inertia("Posts/Disallowed");
+        }
         $data = $request->validated();
         Category::create($data);
         return to_route('categories.index')
@@ -63,6 +74,10 @@ class CategoryController extends Controller
      */
     public function edit(Category $category)
     {
+        $user = auth()->user();
+        if (!$user || !in_array($user->power, [9])) {
+            return inertia("Posts/Disallowed");
+        }
         return inertia('Categories/Edit', [
             'categories' => new CategoryResource($category),
         ]);
@@ -73,6 +88,10 @@ class CategoryController extends Controller
      */
     public function update(UpdateCategoryRequest $request, Category $category)
     {
+        $user = auth()->user();
+        if (!$user || !in_array($user->power, [9])) {
+            return inertia("Posts/Disallowed");
+        }
         $data = $request->validated();
         $data['updated_by'] = Auth::id();
          $category->update($data);
@@ -89,6 +108,10 @@ class CategoryController extends Controller
      */
     public function destroy(Category $category)
     {
+        $user = auth()->user();
+        if (!$user || !in_array($user->power, [9])) {
+            return inertia("Posts/Disallowed");
+        }
         $name = $category->name;
         $category->delete();
 

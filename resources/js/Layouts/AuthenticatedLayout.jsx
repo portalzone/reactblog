@@ -29,22 +29,38 @@ export default function Authenticated({ user, header, children }) {
                                     Dashboard
                                 </NavLink>
                             </div>
-                            <div className="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                                <NavLink
-                                    href={route("categories.index")}
-                                    active={route().current("categories.index")}
-                                >
-                                    Categories
-                                </NavLink>
-                            </div>
-                            <div className="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                                <NavLink
-                                    href={route("posts.index")}
-                                    active={route().current("posts.index")}
-                                >
-                                    Posts
-                                </NavLink>
-                            </div>
+                            {user.power === 9 && (
+                                <div className="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                                    <NavLink
+                                        href={route("categories.index")}
+                                        active={route().current(
+                                            "categories.index"
+                                        )}
+                                    >
+                                        Categories
+                                    </NavLink>
+                                </div>
+                            )}
+                            {(user.power === 9 || user.power === 3) && (
+                                <div className="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                                    <NavLink
+                                        href={route("posts.index")}
+                                        active={route().current("posts.index")}
+                                    >
+                                        Posts
+                                    </NavLink>
+                                </div>
+                            )}
+                            {user.power === 9 && (
+                                <div className="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                                    <NavLink
+                                        href={route("post.delete")}
+                                        active={route().current("post.delete")}
+                                    >
+                                        Deleted Posts
+                                    </NavLink>
+                                </div>
+                            )}
                         </div>
 
                         <div className="hidden sm:flex sm:items-center sm:ms-6">
@@ -149,22 +165,37 @@ export default function Authenticated({ user, header, children }) {
                             Dashboard
                         </ResponsiveNavLink>
                     </div>
-                    <div className="pt-2 pb-3 space-y-1">
-                        <ResponsiveNavLink
-                            href={route("categories.index")}
-                            active={route().current("categories.index")}
-                        >
-                            Categories
-                        </ResponsiveNavLink>
-                    </div>
-                    <div className="pt-2 pb-3 space-y-1">
-                        <ResponsiveNavLink
-                            href={route("posts.index")}
-                            active={route().current("posts.index")}
-                        >
-                            Posts
-                        </ResponsiveNavLink>
-                    </div>
+                    {user.power === 9 && (
+                        <div className="pt-2 pb-3 space-y-1">
+                            <ResponsiveNavLink
+                                href={route("categories.index")}
+                                active={route().current("categories.index")}
+                            >
+                                Categories
+                            </ResponsiveNavLink>
+                        </div>
+                    )}
+                    {(user.power === 9 || user.power === 3) && (
+                        <div className="pt-2 pb-3 space-y-1">
+                            <ResponsiveNavLink
+                                href={route("posts.index")}
+                                active={route().current("posts.index")}
+                            >
+                                Posts
+                            </ResponsiveNavLink>
+                        </div>
+                    )}
+                    {user.power === 9 && (
+                        <div className="pt-2 pb-3 space-y-1">
+                            <ResponsiveNavLink
+                                href={route("post.delete")}
+                                active={route().current("post.delete")}
+                            >
+                                Deleted Posts
+                            </ResponsiveNavLink>
+                        </div>
+                    )}
+
                     <div className="pt-4 pb-1 border-t border-gray-200 dark:border-gray-600">
                         <div className="px-4">
                             <div className="text-base font-medium text-gray-800 dark:text-gray-200">

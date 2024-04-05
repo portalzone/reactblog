@@ -34,6 +34,11 @@ Route::middleware('auth')->group(function () {
     Route::resource('categories', CategoryController::class);
     Route::resource('posts', PostController::class);
     Route::resource('powers', PowerController::class);
+    // Route::get('/post', [PostController::class, 'restore'])->name('post.restore');
+    Route::get('/post', [PostController::class, 'delete'])->name('post.delete');
+    Route::put('/post/{post}', [PostController::class, 'restore'])->name('post.restore');
+    // Route::put('posts/{post}/restore', 'PostController@restore')->name('post.restore');
+
 });
 
 require __DIR__.'/auth.php';

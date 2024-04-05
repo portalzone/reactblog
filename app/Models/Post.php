@@ -12,7 +12,7 @@ class Post extends Model
         'name',
         'body',
         'image',
-        'pending',
+        'hidden',
         'user_id',
         'category_id',
     ];
