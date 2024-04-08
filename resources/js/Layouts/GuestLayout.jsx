@@ -9,7 +9,7 @@ export default function Guest({ children }) {
         setIsNavOpen(!isNavOpen);
     };
     return (
-        <div className="flex flex-col min-h-screen pt-6 bg-gray-100 sm:justify-center sm:pt-0 dark:bg-gray-900">
+        <div className="flex flex-col min-h-screen pt-6 bg-gray-100 sm:justify-top sm:pt-0 dark:bg-gray-900">
             {/* <div>
                 <Link href="/">
                     <ApplicationLogo className="w-20 h-20 text-gray-500 fill-current" />
@@ -111,26 +111,40 @@ export default function Guest({ children }) {
                         </h1>
                         <Link
                             href={route("dashboard")}
-                            className="p-3 text-lg font-bold text-white transition-all bg-gray-900 rounded shadow hover:bg-gray-700 dark:bg-white hover:dark:bg-gray-200 dark:text-gray-900"
+                            className="p-3 text-lg font-bold text-white transition-all bg-gray-900 rounded shadow hover:bg-gray-700 dark:bg-gray-200 hover:dark:bg-gray-200 dark:text-gray-900"
                         >
                             Dashboard
                         </Link>
                     </div>
                 </nav>
 
-                <div className="items-end w-full p-3 text-lg font-bold text-gray-700 bg-white border-t border-gray-300 dark:bg-white dark:text-gray-900 mt-11">
+                <div className="items-end w-full p-4 text-lg font-bold text-gray-100 border-t border-gray-300 bg-gray-950 dark:bg-gray-200 dark:text-gray-950 mt-11">
                     <HomeNavLink
-                        href={route("post.latest")}
-                        active={route().current("post.latest")}
+                        href={route("home")}
+                        active={route().current("home")}
                     >
                         Latest Post
                     </HomeNavLink>
+
                     <HomeNavLink
-                        href={route("dashboard")}
-                        active={route().current("dashboard")}
+                        href={route("post.sport")}
+                        active={route().current("post.sport")}
                     >
-                        Dashboard
+                        Sport
                     </HomeNavLink>
+
+                    {/* <HomeNavLink
+                        href={route("post.latest2")}
+                        active={route().current("post.latest2")}
+                    >
+                        Sport Post
+                    </HomeNavLink> */}
+                    {/* <HomeNavLink
+                        href={route("post.politics")}
+                        active={route().current("post.politics")}
+                    >
+                        Politics
+                    </HomeNavLink> */}
                     <HomeNavLink
                         href={route("posts.index")}
                         active={route().current("posts.index")}

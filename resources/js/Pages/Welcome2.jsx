@@ -3,7 +3,7 @@ import { Link, Head } from "@inertiajs/react";
 import GuestLayout from "@/Layouts/GuestLayout";
 import Left from "./Left";
 import Center from "./Center";
-import Right from "./Right";
+import Right from "./SideBar";
 
 export default function Welcome({ auth, laravelVersion, phpVersion }) {
     return (

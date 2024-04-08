@@ -206,7 +206,7 @@ export default function PostsTable({
                                         style={{ width: 60 }}
                                     />
                                 </td>
-                                <th className="px-3 py-2 hover:underline">
+                                <th className="px-3 py-2 hover:scale-105">
                                     <Link href={route("posts.show", post.id)}>
                                         {post.name}
                                     </Link>

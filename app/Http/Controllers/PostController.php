@@ -4,11 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\Post;
 use App\Models\User;
+use Inertia\Inertia;
 use App\Models\Category;
 use Illuminate\Support\Str;
+use Illuminate\Http\Request;
 use App\Http\Resources\PostResource;
 use App\Http\Resources\UserResource;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\StorePostRequest;
 use Illuminate\Support\Facades\Storage;
@@ -105,20 +106,77 @@ class PostController extends Controller
 
     public function latestPosts()
     {
-        $user = auth()->user();
-        $posts = Post::where('hidden', '0') // Select posts where 'hidden' column is '0'
+        $posts = Post::where('hidden', '0')
                      ->latest()
-                     ->take(5)
-                     ->get(); // Example: Get the 5 latest posts
+                     ->take(90)
+                     ->get();
 
-                     return inertia("Latest", [
-                        "posts" => PostResource::collection($posts),
-                        'auth' => [
-                            'user' => auth()->user(), // Pass authenticated user information
-                        ],
-                    ]);
-
+        return response()->json([
+            'posts' => PostResource::collection($posts),
+        ]);
     }
+    public function latestPosts2()
+    {
+        $posts = Post::where('hidden', '0')
+                    ->where('category_id', '3')
+                     ->latest()
+                     ->take(90)
+                     ->get();
+
+        return response()->json([
+            'posts' => PostResource::collection($posts),
+        ]);
+    }
+
+    public function sportPosts()
+    {
+        $posts = Post::where('category_id', '3')
+                     ->where('hidden', '0')
+                     ->latest()
+                     ->take(90)
+                     ->get();
+
+        return Inertia::render('Sport', [
+            'posts' => PostResource::collection($posts),
+        ]);
+    }
+    public function politicsPosts()
+    {
+        $posts = Post::where('category_id', '4')
+                     ->where('hidden', '0')
+                     ->latest()
+                     ->take(90)
+                     ->get();
+
+        return Inertia::render('Politics', [
+            'posts' => PostResource::collection($posts),
+        ]);
+    }
+
+    public function sidePosts()
+    {
+        $posts = Post::where('hidden', '0')
+                     ->latest()
+                     ->take(20)
+                     ->get();
+
+        return response()->json([
+            'posts' => PostResource::collection($posts),
+        ]);
+    }
+    // public function sportPosts()
+    // {
+    //     $posts = Post::where('category_id', '3')
+    //                  ->where('hidden', '0')
+    //                  ->latest()
+    //                  ->take(20)
+    //                  ->get();
+
+    //     // Use the Inertia::render method to return an Inertia response
+    //     return Inertia::render('Sport', [
+    //         'posts' => PostResource::collection($posts),
+    //     ]);
+    // }
 
 
 
@@ -169,15 +227,23 @@ class PostController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Post $post)
-    {
-        $user = auth()->user();
-        if (!$user || !in_array($user->power, [3, 9])) {
-            return inertia("Posts/Disallowed");
-        }
+    // public function show(Post $post)
+    // {
+    //     $user = auth()->user();
+    //     // if (!$user || !in_array($user->power, [3, 9])) {
+    //     //     return inertia("Posts/Disallowed");
+    //     // }
 
-        return inertia('Posts/Show', [
-            'post' => new PostResource($post),
+    //     return inertia('Posts/Show', [
+    //         'posts' => new PostResource($post),
+    //     ]);
+    // }
+
+    public function show($id)
+    {
+        $post = Post::findOrFail($id);
+        return Inertia::render('Posts/Show', [
+            'post' => $post
         ]);
     }
 

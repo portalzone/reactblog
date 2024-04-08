@@ -15,7 +15,8 @@ Route::get('/', function () {
         'laravelVersion' => Application::VERSION,
         'phpVersion' => PHP_VERSION,
     ]);
-});
+})->name('home');
+
 
 Route::get('/toggle-dark-mode', function () {
     session(['dark-mode' => !session('dark-mode', false)]);
@@ -42,5 +43,10 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::get('/latest-posts', [PostController::class, 'latestPosts'])->name('post.latest');
+Route::get('/latest-posts2', [PostController::class, 'latestPosts2'])->name('post.latest2');
+Route::get('/sport-posts', [PostController::class, 'sportPosts'])->name('post.sport');
+Route::get('/politics-posts', [PostController::class, 'politicsPosts'])->name('post.politics');
+Route::get('/side-posts', [PostController::class, 'sidePosts'])->name('post.side');
 
+Route::get('/posts/{id}', [PostController::class, 'show'])->name('posts.show');
 require __DIR__.'/auth.php';

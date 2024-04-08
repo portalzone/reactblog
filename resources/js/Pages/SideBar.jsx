@@ -26,17 +26,20 @@ export default function Latest({ user }) {
                 console.error("Failed to fetch latest posts");
             }
         } catch (error) {
-            console.error("Error fetching posts:", error);
+            console.error("Error fetching latest posts:", error);
         }
     };
-
     return (
         <div>
-            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
+            {/* <Head title="Welcome" /> */}
+            <div className="px-4">
+                <div className="px-2 pb-3 text-xl font-bold text-white rounded bg-gray-950 dark:bg-gray-200 dark:text-gray-950">
+                    Latest Post
+                </div>
                 {posts.map((post) => (
                     <div
                         key={post.id}
-                        className="flex flex-col transition-transform transform bg-white rounded shadow-md text-gray-950 dark:text-white dark:bg-gray-950 hover:scale-105"
+                        className="flex flex-col transition-transform transform bg-white rounded shadow-md text-gray-950 dark:text-white dark:bg-gray-950 hover:scale-105 hover:text-gray-600"
                     >
                         <Link
                             href={route("posts.show", post.id)}
@@ -44,17 +47,9 @@ export default function Latest({ user }) {
                         >
                             {" "}
                             {/* Use Link component from React Router */}
-                            <img
-                                src={post.image}
-                                alt={post.name}
-                                className="w-full rounded"
-                            />
-                            <h2 className="p-1 mt-2 mb-2 text-xl font-semibold">
+                            <h2 className="p-1 mt-2 mb-2 text-base font-semibold">
                                 {post.name}
                             </h2>
-                            <p className="flex-grow p-1 text-gray-900 border-t dark:text-gray-100">
-                                {truncateText(post.body)}
-                            </p>
                         </Link>
                     </div>
                 ))}
